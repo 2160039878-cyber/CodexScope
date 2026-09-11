@@ -375,7 +375,17 @@
     const pricingForModel = (model) => {
         const key = String(model || "").toLowerCase();
         if (!pricingCache.has(key)) {
-            pricingCache.set(key, pricingRules.find((rule) => rule.patterns.some((pattern) => key.includes(pattern))) || null);
+            let match = null;
+            let matchLength = -1;
+            for (const rule of pricingRules) {
+                for (const pattern of rule.patterns) {
+                    if (key.includes(pattern) && pattern.length > matchLength) {
+                        match = rule;
+                        matchLength = pattern.length;
+                    }
+                }
+            }
+            pricingCache.set(key, match);
         }
         return pricingCache.get(key);
     };
