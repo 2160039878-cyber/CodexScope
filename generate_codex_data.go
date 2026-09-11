@@ -1082,14 +1082,17 @@ func pricingRulesPayload() []PricingRuleExport {
 
 func pricingForModel(model string) *pricingRule {
 	model = strings.ToLower(model)
+	var best *pricingRule
+	bestLength := -1
 	for i := range modelPricingUSDPerM {
 		for _, pattern := range modelPricingUSDPerM[i].patterns {
-			if strings.Contains(model, pattern) {
-				return &modelPricingUSDPerM[i]
+			if strings.Contains(model, pattern) && len(pattern) > bestLength {
+				best = &modelPricingUSDPerM[i]
+				bestLength = len(pattern)
 			}
 		}
 	}
-	return nil
+	return best
 }
 
 func addCost(dst *CostSummary, src CostSummary) {
