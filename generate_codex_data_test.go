@@ -258,6 +258,24 @@ func TestPricingRulesPayloadFeedsRuntimePricing(t *testing.T) {
 	}
 }
 
+func TestPricingRulesCoverCurrentCodexModels(t *testing.T) {
+	tests := []struct {
+		model                 string
+		input, cached, output float64
+	}{
+		{"gpt-6-astra", 10.00, 1.00, 50.00},
+		{"gpt-5.6", 4.00, 0.40, 20.00},
+		{"gpt-5.6-terra", 2.00, 0.20, 12.00},
+		{"gpt-5.6-luna", 0.20, 0.02, 1.20},
+	}
+	for _, test := range tests {
+		rule := pricingForModel(test.model)
+		if rule == nil || rule.input != test.input || rule.cached != test.cached || rule.output != test.output {
+			t.Fatalf("unexpected pricing for %s: %#v", test.model, rule)
+		}
+	}
+}
+
 func TestWriteJSPayloadCreatesParentDirectory(t *testing.T) {
 	out := filepath.Join(t.TempDir(), "nested", "data.js")
 	if err := writeJSPayload(out, "CODEXSCOPE_DATA", map[string]any{"schemaVersion": 2}); err != nil {
